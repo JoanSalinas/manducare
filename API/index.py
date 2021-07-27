@@ -48,9 +48,11 @@ def getRecomendations():
 	myRatings = products
 	user = data["user"]
 	#myRatings = {196: 10}
+	idList = []
 	print(myRatings)
 	print(user, "------------>",products,"--------------------------")
 	for product in products:
+		idList.append(product['id'])
 		#myRatings.append({product['id']: product['value']})
 		print(product)
 	print(myRatings)
@@ -67,16 +69,17 @@ def getRecomendations():
 
 	simCandidates.sort_values(inplace = True, ascending = False)
 	simCandidates = simCandidates.groupby(simCandidates.index).sum()
-	print(simCandidates)
 	dfAuxCount = productsQuantity[productsQuantity['product_id'].isin(list(simCandidates.index))]
+	simCandidates = simCandidates.drop(idList)
 	simCandidates = simCandidates.to_frame('puntuacio')
 	simCandidates["product_id"] = simCandidates.index
 	dfFinal = pd.merge(simCandidates, dfAuxCount, on="product_id")
 	dfFinal= dfFinal.astype({'puntuacio': 'int32'})
-	dfFinal = dfFinal.sort_values(by=['puntuacio','cuantitat'], ascending=[False,False]).head()
+	filteredSims = dfFinal
+	filteredSims = filteredSims.sort_values(by=['puntuacio','cuantitat'], ascending=[False,False]).head()
 
-	print('Final', dfFinal)
-	return dfFinal.to_json(orient="index")
+	print('Final', filteredSims)
+	return filteredSims.to_json(orient="index")
 
 @app.route("/recibirTicket", methods=["GET"])
 def recibir():
