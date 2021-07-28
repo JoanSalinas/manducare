@@ -38,7 +38,7 @@ def saveTicket():
 		orderProductsCollection.insert_one({ "name" : product['name'], "mediaDias" : product['mediaDias'], "order_id" : order_id })
 	return user
 
-@app.route("/recomendations", methods=["GET"])
+@app.route("/recomendations", methods=["POST"])
 def getRecomendations():
 	data = req.get_json()
 	#data = json.loads(data)
@@ -52,7 +52,7 @@ def getRecomendations():
 	print(myRatings)
 	print(user, "------------>",products,"--------------------------")
 	for product in products:
-		idList.append(product['id'])
+		idList.append(int(product['id']))
 		#myRatings.append({product['id']: product['value']})
 		print(product)
 	print(myRatings)
@@ -64,7 +64,7 @@ def getRecomendations():
 		print(key)
 		print(corrMatrix.columns, str(key['id']))
 		sims = corrMatrix[str(key['id'])].dropna()
-		sims = sims.map(lambda x: x * key['value'])
+		sims = sims.map(lambda x: x * int(key['value']))
 		simCandidates = simCandidates.append(sims)
 
 	simCandidates.sort_values(inplace = True, ascending = False)
